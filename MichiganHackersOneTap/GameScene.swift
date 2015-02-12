@@ -9,37 +9,43 @@
 import SpriteKit
 
 class GameScene: SKScene {
+    var circle: SKShapeNode?
+    
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
-        let myLabel = SKLabelNode(fontNamed:"Chalkduster")
-        myLabel.text = "Hello, World!";
-        myLabel.fontSize = 65;
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame));
-        
-        self.addChild(myLabel)
+        self.backgroundColor = UIColor.greenColor()
+        self.physicsBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
     }
     
+    var last_update_time: Double?
+    
+
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
-        /* Called when a touch begins */
-        
-        for touch: AnyObject in touches {
-            let location = touch.locationInNode(self)
-            
-            let sprite = SKSpriteNode(imageNamed:"Spaceship")
-            
-            sprite.xScale = 0.5
-            sprite.yScale = 0.5
-            sprite.position = location
-            
-            let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
-            
-            sprite.runAction(SKAction.repeatActionForever(action))
-            
-            self.addChild(sprite)
-        }
+//        for touch: AnyObject in touches {
+//            if circle == nil {
+//                let loc = touch.locationInNode(self)
+//                let shape = SKShapeNode(circleOfRadius: 40)
+//                shape.fillColor = UIColor.blackColor()
+//                shape.strokeColor = UIColor.blackColor()
+//                shape.position = loc
+//                circle = shape
+//                self.addChild(shape)
+//            } else {
+//                
+//            }
+//        }
+    }
+    
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+        // Empty
     }
    
     override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
+        if last_update_time != nil {
+            // Game loop
+            last_update_time = currentTime
+        } else {
+            last_update_time = currentTime
+        }
     }
+    
 }
