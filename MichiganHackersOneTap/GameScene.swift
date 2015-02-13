@@ -28,6 +28,7 @@ class GameScene: SKScene {
     var last_position: Vector?
     var next_velocity: Vector = Vector(0,0)
     var last_touch_time: Double = NSDate.timeIntervalSinceReferenceDate()
+    var offset = Vector(0,0)
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
@@ -35,10 +36,16 @@ class GameScene: SKScene {
             last_position = Vector(loc)
             last_touch_time = NSDate.timeIntervalSinceReferenceDate()
             var body = self.physicsWorld.bodyAtPoint(loc)
+            next_velocity = Vector(0,0)
             if body != nil {
-                    current_ball = body!.node
-                    body!.dynamic = false
+                offset = Vector(body!.node!.position) - last_position!
+                if abs(offset) > (Double(body!.node!.frame.width) / 2) {
+                    offset = Vector.zero
                     break
+                }
+                current_ball = body!.node
+                body!.dynamic = false
+                break
             } else {
                 let shape = SKShapeNode(circleOfRadius: 20)
                 shape.fillColor = random_color()
@@ -48,6 +55,7 @@ class GameScene: SKScene {
                 shape.physicsBody?.linearDamping = 0
                 shape.physicsBody?.dynamic = false
                 shape.position = loc
+                offset = Vector(0,0)
                 balls.append(shape)
                 current_ball = shape
                 self.addChild(shape)
@@ -59,9 +67,9 @@ class GameScene: SKScene {
         for touch: AnyObject in touches {
             let time = NSDate.timeIntervalSinceReferenceDate()
             let loc = Vector(touch.locationInNode(self))
-            if last_position != nil {
-                next_velocity = (loc - Vector(current_ball!.position)) / (time - last_touch_time)
-                current_ball?.position = loc.point
+            if last_position != nil && current_ball != nil{
+                next_velocity = 0.75 * (loc - Vector(current_ball!.position)) / (time - last_touch_time)
+                current_ball?.position = (loc + offset).point
                 last_touch_time = time
             }
         }
@@ -69,6 +77,9 @@ class GameScene: SKScene {
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
+            if NSDate.timeIntervalSinceReferenceDate() - last_touch_time > 0.05 {
+                next_velocity = Vector.zero
+            }
             current_ball?.physicsBody?.dynamic = true
             current_ball?.physicsBody?.velocity = next_velocity.vec
             current_ball = nil

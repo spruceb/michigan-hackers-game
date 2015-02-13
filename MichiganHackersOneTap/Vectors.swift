@@ -18,6 +18,9 @@ class Vector: Printable {
     convenience init(_ point: CGPoint) {
         self.init(Double(point.x), Double(point.y))
     }
+    convenience init(point: CGPoint) {
+        self.init(point)
+    }
     convenience init(vector: CGVector) {
         self.init(Double(vector.dx), Double(vector.dy))
     }
@@ -38,6 +41,9 @@ class Vector: Printable {
         get {
             return "(\(x), \(y))"
         }
+    }
+    class var zero: Vector {
+        return Vector(0,0)
     }
 }
 
