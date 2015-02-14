@@ -1,2 +1,2 @@
-# maze-game
-iOS game for Michigan Hackers
+# michigan-hackers-game
+Basic iOS game, currently WIP
