@@ -15,26 +15,41 @@ class Vector: Printable {
         self.x = x
         self.y = y
     }
-    convenience init(_ point: CGPoint) {
-        self.init(Double(point.x), Double(point.y))
+    
+    convenience init(cgx: CGFloat, cgy: CGFloat) {
+        self.init(Double(cgx), Double(cgy))
     }
+    
+    convenience init(_ point: CGPoint) {
+        self.init(cgx: point.x, cgy: point.y)
+    }
+    
     convenience init(point: CGPoint) {
         self.init(point)
     }
+    
     convenience init(vector: CGVector) {
-        self.init(Double(vector.dx), Double(vector.dy))
+        self.init(cgx: vector.dx, cgy: vector.dy)
+    }
+    
+    convenience init(size: CGSize) {
+        self.init(cgx: size.width, cgy: size.height)
     }
     
     var point: CGPoint {
-        get {
-            return CGPoint(x: x, y: y)
-        }
+        return CGPoint(x: x, y: y)
     }
     
     var vec: CGVector {
-        get {
-            return CGVector(dx: x, dy: y)
-        }
+        return CGVector(dx: x, dy: y)
+    }
+    
+    var x_vec: Vector {
+        return Vector(x, 0)
+    }
+    
+    var y_vec: Vector {
+        return Vector(0, y)
     }
     
     var description: String {
@@ -42,6 +57,8 @@ class Vector: Printable {
             return "(\(x), \(y))"
         }
     }
+    
+    
     class var zero: Vector {
         return Vector(0,0)
     }
@@ -105,4 +122,10 @@ func norm(vec: Vector) -> Vector {
 
 func dot(first: Vector, second: Vector) -> Double {
     return first.x * second.x + first.y * second.y
+}
+
+// Utility functions involving vectors:
+
+func center_vector(rect: CGRect) -> Vector {
+    return Vector(cgx: rect.width/2, cgy: rect.height/2)
 }
