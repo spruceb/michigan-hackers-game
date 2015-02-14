@@ -12,7 +12,16 @@ import SpriteKit
 class GameScene: SKScene {
     var last_update_time: Double?
     var player = SKShapeNode(circleOfRadius: 20)
-    var touch_offset = Vector.zero
+    var last_touch_position: Vector?
+    var touch_offset: Vector {
+        get {
+            if last_touch_position == nil {
+                return Vector.zero
+            } else {
+                return Vector(player.position) - last_touch_position!
+            }
+        }
+    }
     
     
     override func didMoveToView(view: SKView) {
@@ -25,26 +34,45 @@ class GameScene: SKScene {
         self.player.fillColor = SKColor.blackColor()
         self.player.strokeColor = SKColor.blackColor()
         self.player.physicsBody = SKPhysicsBody(circleOfRadius: player.frame.width/2)
-        self.player.physicsBody?.dynamic = true
+        self.player.physicsBody?.dynamic = false
         self.addChild(player)
+        
+        self.view?.multipleTouchEnabled
     }
     
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
-            touch_offset = Vector(player.position) - Vector(touch.locationInNode(self))
+            last_touch_position = Vector(touch.locationInNode(self))
         }
+    }
+    
+    func new_player_pos_in_bounds(pos: Vector) -> Bool {
+        let new_frame = center_rect_at(self.player.frame, pos)
+        return self.view!.frame.contains(new_frame)
     }
     
     override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
-            player.position = (Vector(touch.locationInNode(self)) + touch_offset).point
+            println("newtouch")
+            let touch_pos = Vector(touch.locationInNode(self))
+            let player_pos = Vector(self.player.position)
+            let new_pos = touch_pos + touch_offset
+            if new_player_pos_in_bounds(new_pos) {
+                self.player.position = new_pos.point
+            } else if new_player_pos_in_bounds(new_pos.x_vec + player_pos.y_vec) {
+                self.player.position = (new_pos.x_vec + player_pos.y_vec).point
+            } else if new_player_pos_in_bounds(new_pos.y_vec + player_pos.x_vec) {
+                self.player.position = (new_pos.y_vec + player_pos.x_vec).point
+            }
+            last_touch_position = touch_pos
         }
     }
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
-            touch_offset = Vector(0, 0)
+            last_touch_position = Vector(touch.locationInNode(self))
+
         }
     }
     

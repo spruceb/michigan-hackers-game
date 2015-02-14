@@ -58,7 +58,6 @@ class Vector: Printable {
         }
     }
     
-    
     class var zero: Vector {
         return Vector(0,0)
     }
