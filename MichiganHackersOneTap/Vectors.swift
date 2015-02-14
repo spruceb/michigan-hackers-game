@@ -129,3 +129,8 @@ func dot(first: Vector, second: Vector) -> Double {
 func center_vector(rect: CGRect) -> Vector {
     return Vector(cgx: rect.width/2, cgy: rect.height/2)
 }
+
+func center_rect_at(rect: CGRect, vec: Vector) -> CGRect {
+    let new_origin = vec - (Vector(size: rect.size)/2)
+    return CGRect(origin: new_origin.point, size: rect.size)
+}
