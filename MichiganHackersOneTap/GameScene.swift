@@ -17,7 +17,7 @@ func random(low: Int, high: Int) -> Int {
 }
 
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     var last_update_time: Double?
     var player = SKSpriteNode(imageNamed: "player")
     var last_touch_position: Vector?
@@ -30,13 +30,18 @@ class GameScene: SKScene {
             }
         }
     }
-    
+    var lives = 3
+    var score = 0
+
     var backgrounds: [SKSpriteNode] = []
     let backgroundScrollRate = 0.9
     
     var asteroids: [SKNode] = []
     let maxAsteroidsSideLen = 96
     var next_asteroid_time: Double?
+    
+    let playerCategory: UInt32 = 0x1 << 0
+    let asteroidsCategory: UInt32 = 0x1 << 1
     
     func random_asteroid_location() -> Vector {
         let x = Double(random(Int(self.view!.frame.width)))
@@ -55,17 +60,20 @@ class GameScene: SKScene {
         node.physicsBody = SKPhysicsBody(circleOfRadius: node.frame.width / 2)
         node.physicsBody?.velocity = random_asteroid_speed() // CGVector(dx: 0, dy: -300)
         node.physicsBody?.dynamic = true
+        node.physicsBody?.categoryBitMask = asteroidsCategory
         node.zPosition = 5
         return node
     }
     
     func init_player() {
-        self.player.position = Vector(Double(self.view!.frame.width)/2.0,
+        player.position = Vector(Double(self.view!.frame.width)/2.0,
             Double(player.frame.height)/2.0 +
                 Double(self.view!.frame.height) * 0.1 ).point
-        self.player.physicsBody = SKPhysicsBody(circleOfRadius: player.frame.width/2)
-        self.player.physicsBody?.dynamic = false
-        self.player.zPosition = 10
+        player.physicsBody = SKPhysicsBody(circleOfRadius: player.frame.width/2)
+        player.physicsBody?.dynamic = false
+        player.physicsBody?.categoryBitMask = playerCategory
+        player.physicsBody?.contactTestBitMask = playerCategory | asteroidsCategory
+        player.zPosition = 10
         self.addChild(player)
     }
     
@@ -87,6 +95,7 @@ class GameScene: SKScene {
         self.physicsWorld.gravity = CGVector(dx: 0,dy: 0)
         init_background()
         init_player()
+        self.physicsWorld.contactDelegate = self
         self.view?.multipleTouchEnabled
     }
     
@@ -122,6 +131,29 @@ class GameScene: SKScene {
             last_touch_position = Vector(touch.locationInNode(self))
 
         }
+    }
+    
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        var asteroid: SKNode? = nil
+        var player: SKNode? = nil
+        if contact.bodyA.categoryBitMask == asteroidsCategory {
+            asteroid = contact.bodyA.node
+            player = contact.bodyB.node
+        } else {
+            asteroid = contact.bodyB.node
+            player = contact.bodyA.node
+        }
+        let explosion = SKEmitterNode(fileNamed: "explosion.sks")
+        let scale = 1.5 * asteroid!.frame.width / CGFloat(maxAsteroidsSideLen)
+        explosion.xScale = scale
+        explosion.yScale = scale
+        explosion.zPosition = 100
+        explosion.position = asteroid!.position
+        asteroid?.removeFromParent()
+        self.addChild(explosion)
+        explosion.numParticlesToEmit = 25
+        lives -= 1
     }
     
     func background_update(delta_t: Double) {
