@@ -34,6 +34,31 @@ class GameScene: SKScene {
     var backgrounds: [SKSpriteNode] = []
     let backgroundScrollRate = 0.9
     
+    var asteroids: [SKNode] = []
+    let maxAsteroidsSideLen = 96
+    var next_asteroid_time: Double?
+    
+    func random_asteroid_location() -> Vector {
+        let x = Double(random(Int(self.view!.frame.width)))
+        return Vector(x, Double(self.view!.frame.height) + 1.5 * Double(maxAsteroidsSideLen))
+    }
+    
+    func random_asteroid_speed() -> CGVector {
+        return CGVector(dx: 50 - random(100), dy: -random(100, 300))
+    }
+    
+    func random_asteroid() -> SKShapeNode {
+        let size = random(4)
+        let node = SKShapeNode(circleOfRadius: CGFloat(48.0 / pow(2.0, Double(size))))
+        node.fillColor = UIColor.grayColor()
+        node.position = random_asteroid_location().point
+        node.physicsBody = SKPhysicsBody(circleOfRadius: node.frame.width / 2)
+        node.physicsBody?.velocity = random_asteroid_speed() // CGVector(dx: 0, dy: -300)
+        node.physicsBody?.dynamic = true
+        node.zPosition = 5
+        return node
+    }
+    
     func init_player() {
         self.player.position = Vector(Double(self.view!.frame.width)/2.0,
             Double(player.frame.height)/2.0 +
@@ -51,6 +76,7 @@ class GameScene: SKScene {
             background.size = self.view!.frame.size
             background.anchorPoint = CGPoint(x: 0, y: 0)
             background.position = CGPoint(x: 0, y: CGFloat(i) * background.size.height - CGFloat(i))
+            background.zPosition = -100
             self.addChild(background)
             backgrounds.append(background)
         }
@@ -109,6 +135,16 @@ class GameScene: SKScene {
         }
     }
     
+    func add_asteroid(currentTime: Double) {
+        if currentTime > next_asteroid_time {
+            let asteroid = random_asteroid()
+            self.addChild(asteroid)
+        }
+        if currentTime > next_asteroid_time || next_asteroid_time == nil {
+            next_asteroid_time = currentTime + 0.5 + 1.5 * Double(arc4random_uniform(UINT32_MAX) / UINT32_MAX)
+        }
+    }
+    
     override func update(currentTime: CFTimeInterval) {
         if last_update_time == nil {
             // Game loop
@@ -116,7 +152,7 @@ class GameScene: SKScene {
         }
         let delta_t = currentTime - last_update_time!
         background_update(delta_t)
-        
+        add_asteroid(currentTime)
         last_update_time = currentTime
     }
     
