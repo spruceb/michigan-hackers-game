@@ -10,11 +10,16 @@ import UIKit
 
 class GameOverController: UIViewController {
     var scene: GameScene?
+    var new_game: GameViewController?
     @IBOutlet var scoreLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // Do any additional setup after loading the view.
+    }
+    
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+        self.new_game?.scene_init()
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     override func viewWillAppear(animated: Bool) {

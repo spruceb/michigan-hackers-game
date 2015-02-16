@@ -27,26 +27,32 @@ extension SKNode {
 
 class GameViewController: UIViewController {
     var scene: GameScene?
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    
+    func scene_init() {
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {
-            // Configure the view.
-            let skView = self.view as! SKView
-            self.scene = scene
-            /* Sprite Kit applies additional optimizations to improve rendering performance */
-            skView.ignoresSiblingOrder = true
-            skView.showsFPS = true
-            skView.showsNodeCount = true
-            /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFill
             scene.viewController = self
-            skView.presentScene(scene)
+            self.scene = scene
         }
     }
-
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let skView = self.view as! SKView
+        skView.ignoresSiblingOrder = true
+        skView.showsFPS = true
+        skView.showsNodeCount = true
+        scene_init()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        (self.view as! SKView).presentScene(scene)
+    }
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        (segue.destinationViewController as! GameOverController).scene = scene
+        let game_over = (segue.destinationViewController as! GameOverController)
+        game_over.scene = scene
+        game_over.new_game = self
     }
     
     override func shouldAutorotate() -> Bool {
