@@ -64,8 +64,7 @@ class GameScene: SKScene {
         self.view?.multipleTouchEnabled
     }
     
-    
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent?) {
         for touch: AnyObject in touches {
             last_touch_position = Vector(touch.locationInNode(self))
         }
@@ -76,7 +75,7 @@ class GameScene: SKScene {
         return self.view!.frame.contains(new_frame)
     }
     
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
             let touch_pos = Vector(touch.locationInNode(self))
             let player_pos = Vector(self.player.position)
@@ -92,7 +91,7 @@ class GameScene: SKScene {
         }
     }
     
-    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
             last_touch_position = Vector(touch.locationInNode(self))
 
