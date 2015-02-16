@@ -18,6 +18,8 @@ func random(low: Int, high: Int) -> Int {
 
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    var viewController: UIViewController?
+    
     var last_update_time: Double?
     var player = SKSpriteNode(imageNamed: "player")
     var last_touch_position: Vector?
@@ -30,6 +32,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    
     var lives = 3
     var score = 0
 
@@ -154,6 +157,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(explosion)
         explosion.numParticlesToEmit = 25
         lives -= 1
+        if lives <= 0 {
+            self.viewController!.performSegueWithIdentifier("gameover", sender: self)
+        }
     }
     
     func background_update(delta_t: Double) {
