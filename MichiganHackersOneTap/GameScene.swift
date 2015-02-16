@@ -8,6 +8,15 @@
 
 import SpriteKit
 
+func random(max: Int) -> Int {
+    return Int(arc4random_uniform(UInt32(max)))
+}
+
+func random(low: Int, high: Int) -> Int {
+    return random(high) + low
+}
+
+
 class GameScene: SKScene {
     var last_update_time: Double?
     var player = SKSpriteNode(imageNamed: "player")
