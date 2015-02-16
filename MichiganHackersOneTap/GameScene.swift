@@ -52,18 +52,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func random_asteroid_speed() -> CGVector {
-        return CGVector(dx: 50 - random(100), dy: -random(100, 300))
+        return CGVector(dx: 75 - random(100), dy: -random(100, 400))
     }
     
     func random_asteroid() -> SKShapeNode {
-        let size = random(4)
-        let node = SKShapeNode(circleOfRadius: CGFloat(48.0 / pow(2.0, Double(size))))
+        let size = random(10) + 1
+        let radius: CGFloat = CGFloat(Int(48 / Double(size)))
+        let node = SKShapeNode(circleOfRadius: radius)
         node.fillColor = UIColor.grayColor()
+        node.strokeColor = UIColor.lightGrayColor()
         node.position = random_asteroid_location().point
         node.physicsBody = SKPhysicsBody(circleOfRadius: node.frame.width / 2)
         node.physicsBody?.velocity = random_asteroid_speed() // CGVector(dx: 0, dy: -300)
         node.physicsBody?.dynamic = true
         node.physicsBody?.categoryBitMask = asteroidsCategory
+        node.physicsBody?.restitution = 0.5
         node.zPosition = 5
         return node
     }
@@ -137,6 +140,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    
     func didBeginContact(contact: SKPhysicsContact) {
         var asteroid: SKNode? = nil
         var player: SKNode? = nil
@@ -176,11 +180,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func add_asteroid(currentTime: Double) {
         if currentTime > next_asteroid_time {
             let asteroid = random_asteroid()
+            asteroids.append(asteroid)
             self.addChild(asteroid)
         }
         if currentTime > next_asteroid_time || next_asteroid_time == nil {
-            next_asteroid_time = currentTime + 0.5 + 1.5 * Double(arc4random_uniform(UINT32_MAX) / UINT32_MAX)
+            next_asteroid_time = currentTime + 0.25 + 1.5 * Double(arc4random_uniform(UINT32_MAX) / UINT32_MAX)
         }
+        score += 1
     }
     
     override func update(currentTime: CFTimeInterval) {
@@ -192,6 +198,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         background_update(delta_t)
         add_asteroid(currentTime)
         last_update_time = currentTime
+        for asteroid in asteroids {
+            let view_frame = self.view!.frame
+            let asteroid_rect = center_rect_at(asteroid.frame, Vector(asteroid.position))
+            if !view_frame.intersects(asteroid_rect) && asteroid.position.y < view_frame.height {
+                asteroid.removeFromParent()
+            }
+            
+        }
     }
     
 }
