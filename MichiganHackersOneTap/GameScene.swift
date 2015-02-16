@@ -198,14 +198,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         background_update(delta_t)
         add_asteroid(currentTime)
         last_update_time = currentTime
+        var filtered_asteroids: [SKNode] = []
         for asteroid in asteroids {
             let view_frame = self.view!.frame
             let asteroid_rect = center_rect_at(asteroid.frame, Vector(asteroid.position))
             if !view_frame.intersects(asteroid_rect) && asteroid.position.y < view_frame.height {
                 asteroid.removeFromParent()
+            } else {
+                filtered_asteroids.append(asteroid)
             }
             
         }
+        asteroids = filtered_asteroids
         (self.childNodeWithName("lives") as! SKLabelNode).text = String(lives)
     }
     
