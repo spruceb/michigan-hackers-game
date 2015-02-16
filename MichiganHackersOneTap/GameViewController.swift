@@ -40,8 +40,8 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         let skView = self.view as! SKView
         skView.ignoresSiblingOrder = true
-        skView.showsFPS = true
-        skView.showsNodeCount = true
+//        skView.showsFPS = true
+//        skView.showsNodeCount = true
         scene_init()
     }
     

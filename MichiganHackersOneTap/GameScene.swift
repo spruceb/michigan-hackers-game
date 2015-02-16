@@ -206,6 +206,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             
         }
+        (self.childNodeWithName("lives") as! SKLabelNode).text = String(lives)
     }
     
 }
